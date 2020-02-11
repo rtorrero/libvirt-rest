@@ -1,0 +1,22 @@
+{
+  "name": "libvirt-rest",
+  "version": "0.1.0",
+  "description": "HTTP REST service to do simple operations on libvirt domains",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc"
+  },
+  "keywords": [
+    "libvirt"
+  ],
+  "author": "Ruben Torrero Marijnissen",
+  "license": "MIT",
+  "dependencies": {
+    "@types/express": "^4.17.2",
+    "@vmngr/libvirt": "0.0.5",
+    "chalk": "^3.0.0",
+    "express": "^4.17.1",
+    "typescript": "^3.7.5"
+  }
+}
