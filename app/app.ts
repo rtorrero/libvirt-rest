@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import process from "process";
 
-import libvirt, { domainDescToXml, DomainBuilder } from "@vmngr/libvirt";
+import libvirt, { domainDescToXml, DomainBuilder, domainDescFromXml } from "@vmngr/libvirt";
 
 (async () => {
 
@@ -10,13 +10,26 @@ import libvirt, { domainDescToXml, DomainBuilder } from "@vmngr/libvirt";
 
     await hypervisor.connectOpen();
 
-    const domain = await hypervisor.domainLookupByName("win10-virtio");
+    const domain = await hypervisor.domainLookupByName("sles12sp5");
     const domainXml = domainDescToXml(domain);
+    process.stdout.write(`This is the XML dump :-): ${domainXml}`);
+    const domainTemplate = await domainDescFromXml(domainXml);
     const domainUpdated = new DomainBuilder()
-        .fromTemplate(domainXml)
-        .addHostdev()
+        .fromTemplate(domainTemplate)
+        .addHostdev({
+            type: "usb",
+            mode: "subsystem",
+            source: {
+                vendor: { id: "24ae" },
+                product: { id: "1001" },
+            },
+        })
+        .build();
 
-    const xmlstuff = await hypervisor.domainGetXMLDesc(domain);
+    const domainUpdatedXml = domainDescToXml(domainUpdated);
+    process.stdout.write(`This is the XML dump :-): ${domainUpdatedXml}`);
+
+    /*const xmlstuff = await hypervisor.domainGetXMLDesc(domain);
     process.stdout.write(`This is the XML dump :-): ${xmlstuff}`);
 
     const hostname = await hypervisor.connectGetHostname();
@@ -46,6 +59,6 @@ import libvirt, { domainDescToXml, DomainBuilder } from "@vmngr/libvirt";
     for (const name of inactiveDomainNames) {
         process.stdout.write(chalk.red(`  ${name}\n`));
     }
-    process.stdout.write("\n");
+    process.stdout.write("\n");*/
 
 })();
