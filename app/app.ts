@@ -10,9 +10,8 @@ import libvirt, { domainDescToXml, DomainBuilder, domainDescFromXml } from "@vmn
 
     await hypervisor.connectOpen();
 
-    const domain = await hypervisor.domainLookupByName("sles12sp5");
-    const domainXml = domainDescToXml(domain);
-    process.stdout.write(`This is the XML dump :-): ${domainXml}`);
+    const domain = await hypervisor.domainLookupByName("opensusetumbleweed");
+    const domainXml = await hypervisor.domainGetXMLDesc(domain);
     const domainTemplate = await domainDescFromXml(domainXml);
     const domainUpdated = new DomainBuilder()
         .fromTemplate(domainTemplate)
@@ -20,14 +19,17 @@ import libvirt, { domainDescToXml, DomainBuilder, domainDescFromXml } from "@vmn
             type: "usb",
             mode: "subsystem",
             source: {
-                vendor: { id: "24ae" },
-                product: { id: "1001" },
+                vendor: { id: "0x046d" },
+                product: { id: "0xc52b" },
             },
         })
         .build();
 
     const domainUpdatedXml = domainDescToXml(domainUpdated);
-    process.stdout.write(`This is the XML dump :-): ${domainUpdatedXml}`);
+
+    process.stdout.write(`${domainUpdatedXml}`);
+
+    await hypervisor.domainCreateXML(domainUpdatedXml);
 
     /*const xmlstuff = await hypervisor.domainGetXMLDesc(domain);
     process.stdout.write(`This is the XML dump :-): ${xmlstuff}`);
