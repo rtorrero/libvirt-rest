@@ -1,7 +1,7 @@
 import chalk from "chalk";
 import process from "process";
 
-import libvirt, { domainDescToXml, DomainBuilder, domainDescFromXml } from "@vmngr/libvirt";
+import libvirt, { domainDescToXml, DomainBuilder, domainDescFromXml, domainDescDeviceToXml} from "@vmngr/libvirt";
 
 (async () => {
 
@@ -10,11 +10,10 @@ import libvirt, { domainDescToXml, DomainBuilder, domainDescFromXml } from "@vmn
 
     await hypervisor.connectOpen();
 
-    const domain = await hypervisor.domainLookupByName("opensusetumbleweed");
+    const domain = await hypervisor.domainLookupByName("win10");
     const domainXml = await hypervisor.domainGetXMLDesc(domain);
     const domainTemplate = await domainDescFromXml(domainXml);
     const domainUpdated = new DomainBuilder()
-        .fromTemplate(domainTemplate)
         .addHostdev({
             type: "usb",
             mode: "subsystem",
@@ -27,9 +26,11 @@ import libvirt, { domainDescToXml, DomainBuilder, domainDescFromXml } from "@vmn
 
     const domainUpdatedXml = domainDescToXml(domainUpdated);
 
-    process.stdout.write(`${domainUpdatedXml}`);
+    const deviceXml = domainDescDeviceToXml(domainUpdated);
 
-    await hypervisor.domainCreateXML(domainUpdatedXml);
+    process.stdout.write(`${deviceXml}`);
+
+   // await hypervisor.domainCreateXML(domainUpdatedXml);
 
     /*const xmlstuff = await hypervisor.domainGetXMLDesc(domain);
     process.stdout.write(`This is the XML dump :-): ${xmlstuff}`);
